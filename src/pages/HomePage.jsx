@@ -1,25 +1,26 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // НЕ ЗАБУДЬ ЦЕЙ ІМПОРТ
+import { Link } from 'react-router-dom';
+import { useBooks } from '../context/BooksContext';
 import owlImage from '../assets/owl.png';
 
 function HomePage() {
-  const books = [
-    { id: 1, title: 'If Not Now When', author: 'Author Name', status: 'Прочитано', color: '#e8d576' },
-    { id: 2, title: 'Abukoo Sudoku', author: 'Author Name', status: 'Читаю', color: '#7bc77b' },
-    { id: 3, title: 'Minimal Chair', author: 'Author Name', status: 'Планую', color: '#a6cbe0' },
-    { id: 4, title: 'If Not Now When', author: 'Author Name', status: 'Читаю', color: '#e8d576' },
-    { id: 5, title: 'Abukoo Sudoku', author: 'Author Name', status: 'Прочитано', color: '#7bc77b' },
-    { id: 6, title: 'Minimal Chair', author: 'Author Name', status: 'Читаю', color: '#a6cbe0' },
-    { id: 7, title: 'If Not Now When', author: 'Author Name', status: 'Планую', color: '#e8d576' },
-    { id: 8, title: 'Minimal Chair', author: 'Author Name', status: 'Читаю', color: '#a6cbe0' },
-  ];
+  const { books, removeBook } = useBooks();
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Прочитано': return '#6ebea6';
-      case 'Читаю': return '#b68cb6';
-      case 'Планую': return '#7d93b0';
+      case 'finished': case 'Прочитано': return '#6ebea6';
+      case 'reading': case 'Читаю': return '#b68cb6';
+      case 'planned': case 'Планую': return '#7d93b0';
       default: return '#ccc';
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'reading': return 'Читаю';
+      case 'finished': return 'Прочитано';
+      case 'planned': return 'Планую';
+      default: return status;
     }
   };
 
@@ -43,15 +44,56 @@ function HomePage() {
 
         <div className="books-grid">
           {books.map((book) => (
-            <div key={book.id} className="book-card">
-              <div className="book-cover" style={{ backgroundColor: book.color }}>
-                <span className="cover-text">{book.title}</span>
+            <div key={book.id} className="book-card" style={{ position: 'relative' }}>
+              
+              <button 
+                onClick={() => removeBook(book.id)}
+                style={{
+                  position: 'absolute',
+                  top: '10px',
+                  right: '10px',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '24px',
+                  height: '24px',
+                  cursor: 'pointer',
+                  color: '#e74c3c',
+                  fontWeight: 'bold',
+                  fontSize: '18px',
+                  lineHeight: '1',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 10
+                }}
+              >
+                ×
+              </button>
+
+              <div className="book-cover" style={{ backgroundColor: book.color || '#e8d576' }}>
+                 {book.imgUrl ? (
+                    <img 
+                      src={book.imgUrl} 
+                      alt={book.title} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} 
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        const span = document.createElement('span');
+                        span.className = 'cover-text';
+                        span.innerText = book.title;
+                        e.target.parentNode.appendChild(span);
+                      }}
+                    />
+                 ) : (
+                    <span className="cover-text">{book.title}</span>
+                 )}
               </div>
               <div className="book-info">
-                <h3>Назва книги</h3>
-                <p>Автор</p>
+                <h3>{book.title}</h3>
+                <p>{book.author}</p>
                 <div className="status-badge" style={{ backgroundColor: getStatusColor(book.status) }}>
-                  {book.status}
+                  {getStatusText(book.status)}
                 </div>
               </div>
             </div>

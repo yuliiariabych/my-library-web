@@ -1,8 +1,23 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useBooks } from '../context/BooksContext';
 import owlImage from '../assets/owl.png';
 
 function AddBookPage() {
+  const { addBook } = useBooks();
+  const navigate = useNavigate();
+
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [status, setStatus] = useState('reading');
+  const [imgUrl, setImgUrl] = useState('');
+
+  const handleSave = () => {
+    if (!title || !author) return;
+    addBook({ title, author, status, imgUrl });
+    navigate('/home');
+  };
+
   return (
     <div className="home-container">
       <header className="main-header">
@@ -23,39 +38,43 @@ function AddBookPage() {
           <form className="login-form">
             <div className="input-group">
               <label>Назва книги</label>
-              <input type="text" placeholder="Назва книги" />
+              <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Назва книги" />
             </div>
             
             <div className="input-group">
               <label>Автор</label>
-              <input type="text" placeholder="Автор" />
+              <input type="text" value={author} onChange={e => setAuthor(e.target.value)} placeholder="Автор" />
             </div>
 
             <div className="input-group">
               <label>URL картинки</label>
-              <input type="text" placeholder="URL картинки" />
+              <input type="text" value={imgUrl} onChange={e => setImgUrl(e.target.value)} placeholder="URL картинки" />
             </div>
 
             <div className="input-group">
               <label>Статус</label>
-              <select style={{
-                width: '100%',
-                padding: '14px',
-                border: 'none',
-                backgroundColor: '#dcdceb',
-                borderRadius: '10px',
-                fontFamily: 'Montserrat, sans-serif',
-                fontSize: '16px',
-                color: '#3e3c61',
-                cursor: 'pointer'
-              }}>
+              <select 
+                value={status} 
+                onChange={e => setStatus(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  border: 'none',
+                  backgroundColor: '#dcdceb',
+                  borderRadius: '10px',
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontSize: '16px',
+                  color: '#3e3c61',
+                  cursor: 'pointer'
+                }}
+              >
                 <option value="reading">Читаю</option>
                 <option value="finished">Прочитано</option>
                 <option value="planned">Планую</option>
               </select>
             </div>
 
-            <button type="button" className="login-btn" style={{ maxWidth: '200px', marginTop: '20px' }}>Зберегти</button>
+            <button type="button" onClick={handleSave} className="login-btn" style={{ maxWidth: '200px', marginTop: '20px' }}>Зберегти</button>
           </form>
         </div>
 
